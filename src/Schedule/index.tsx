@@ -4,7 +4,6 @@ import { Agenda } from 'react-native-calendars';
 import { Card, Avatar } from 'react-native-paper';
 
 interface ObjectItem {
-  height: number,
   name: string,
 }
 
@@ -52,7 +51,7 @@ export default function Schedule() {
         items={items}
         loadItemsForMonth={(month) => { loadItems(month) }}
         selected={'2020-07-18'}
-        renderItem={renderItem}
+        renderItem={(day: ObjectItem) => renderItem(day)}
         renderEmptyDate={() => { return (<View />); }}
         rowHasChanged={(r1, r2) => { return r1.name !== r2.name }}
         markingType={'multi-dot'}
