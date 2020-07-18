@@ -1,20 +1,68 @@
-import React from 'react';
+import React, {useState} from 'react';
+import {View, TouchableOpacity, Text} from 'react-native';
+import {Agenda} from 'react-native-calendars';
+import {Card, Avatar} from 'react-native-paper';
 
-import {View, Text, Button, StyleSheet} from 'react-native';
+const timeToString = (time) => {
+  const date = new Date(time);
+  return date.toISOString().split('T')[0];
+};
 
-export default function Home() {
+export default function Schedule() {
+  const [items, setItems] = useState({});
+
+  const loadItems = (day) => {
+    setTimeout(() => {
+      for (let i = -15; i < 85; i++) {
+        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+        const strTime = timeToString(time);
+        if (!items[strTime]) {
+          items[strTime] = [];
+          const numItems = Math.floor(Math.random() * 3 + 1);
+          for (let j = 0; j < numItems; j++) {
+            items[strTime].push({
+              name: 'Item for ' + strTime + ' #' + j,
+              height: Math.max(50, Math.floor(Math.random() * 150)),
+            });
+          }
+        }
+      }
+      const newItems = {};
+      Object.keys(items).forEach((key) => {
+        newItems[key] = items[key];
+      });
+      setItems(newItems);
+    }, 1000);
+  };
+
+  const renderItem = (item) => {
     return (
-        <View style={page.container}>
-            <Text>Schedule</Text>
-        </View>
-    )
-}
+      <TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
+        <Card>
+          <Card.Content>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Text>{item.name}</Text>
+              <Avatar.Text label="J" />
+            </View>
+          </Card.Content>
+        </Card>
+      </TouchableOpacity>
+    );
+  };
 
-const page = StyleSheet.create({
-    container: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center'
-    }
-})
+  return (
+    <View style={{flex: 1}}>
+      <Agenda
+        items={items}
+        loadItemsForMonth={loadItems}
+        selected={'2017-05-16'}
+        renderItem={renderItem}
+      />
+    </View>
+  );
+};
