@@ -7,15 +7,8 @@ interface IObjectItem {
   name: string,
 }
 
-
-function timeToString(time: string) {
-  const date = new Date(time);
-
-  return date.toISOString().split('T')[0];
-};
-
 export default function Schedule() {
-
+  const [date, setDate] = useState('2020-07-25')
   const [items, setItems] = useState({});
   const [reloadPage, setReloadPage] = useState(false);
 
@@ -25,30 +18,21 @@ export default function Schedule() {
     })
   }, []);
 
-  useEffect(() => {
-    console.log('teste')
-  }, [reloadPage]);
-
-  function loadItems(day: any) {
-    console.log('tryLoadItens');
-  };
-
-  function handleNewCadastro() {
+  async function handleNewCadastro() {
     let newArray = items;
 
-    newArray['2020-07-25'].push({name: 'item 3 - any js object abc'});
-
-    setItems(newArray);
+    
+    if (newArray[date] === undefined) {
+      newArray[date] = [{name: 'item 3 - any js object abc'}];
+    } else {
+      newArray[date].push({name: 'item 3 - any js object abc'});
+    }
+    
+    await setItems(newArray);
     setReloadPage(reloadPage === true ? false : true );
   }
 
-  function tryRenderDay(day: any, item: any) {
-    console.log(day);
-    console.log(item);
-    return <View />
-  }
-
-  const renderItem = (item: IObjectItem) => {
+  function renderItem(item: any) {
     return (
       <TouchableOpacity style={{ marginRight: 10, marginTop: 17 }}>
         <Card>
@@ -72,17 +56,12 @@ export default function Schedule() {
     <View style={{ flex: 1 }}>
       <Agenda
         items={items}
-        loadItemsForMonth={(month) => { loadItems(month) }}
-        selected={'2020-07-25'}
-        renderDay={(day, item) => tryRenderDay(day, item)}
-        renderItem={(day: IObjectItem) => renderItem(day)}
-        renderEmptyDate={() => { return (<View />); }}
+        selected={date}
+        renderItem={(item) => renderItem(item)}
+        onDayPress={(day)=>{setDate(day.dateString)}}
+        renderEmptyDate={() => { return (<View />); }}    
         rowHasChanged={(r1, r2) => { return r1 !== r2 }}
-        onDayChange={(day)=>{console.log('day changed')}}
-        markingType={'multi-dot'}
-        markedDates={{
-          '2020-07-18': { dots: [{ key: 'massage', color: 'red', selectedDotColor: 'red' }] },
-        }}
+        markingType={'multi-dot'}      
       />
       <IconButton style={style.floatButton}
         icon={require('../../assets/plus-circle.png')}
