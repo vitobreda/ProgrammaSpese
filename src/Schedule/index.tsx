@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
 import { Agenda } from 'react-native-calendars';
-import { Card, Avatar } from 'react-native-paper';
+import { Card, Avatar, IconButton } from 'react-native-paper';
 
-interface ObjectItem {
+interface IObjectItem {
   name: string,
 }
 
@@ -15,17 +15,40 @@ function timeToString(time: string) {
 };
 
 export default function Schedule() {
+
   const [items, setItems] = useState({});
+  const [reloadPage, setReloadPage] = useState(false);
+
+  useEffect(() => {
+    setItems({
+      '2020-07-25': [{ name: 'item 1 - any js object abc' }, { name: 'item 2 - any js object abc' }],
+    })
+  }, []);
+
+  useEffect(() => {
+    console.log('teste')
+  }, [reloadPage]);
 
   function loadItems(day: any) {
-
-    setItems({
-      '2020-07-18': [{ name: 'item 1 - any js object abc' }],
-    })
-
+    console.log('tryLoadItens');
   };
 
-  const renderItem = (item: ObjectItem) => {
+  function handleNewCadastro() {
+    let newArray = items;
+
+    newArray['2020-07-25'].push({name: 'item 3 - any js object abc'});
+
+    setItems(newArray);
+    setReloadPage(reloadPage === true ? false : true );
+  }
+
+  function tryRenderDay(day: any, item: any) {
+    console.log(day);
+    console.log(item);
+    return <View />
+  }
+
+  const renderItem = (item: IObjectItem) => {
     return (
       <TouchableOpacity style={{ marginRight: 10, marginTop: 17 }}>
         <Card>
@@ -37,7 +60,7 @@ export default function Schedule() {
                 alignItems: 'center',
               }}>
               <Text>{item.name}</Text>
-              <Avatar.Text label="J" />
+              <Avatar.Text label="J"/>
             </View>
           </Card.Content>
         </Card>
@@ -50,15 +73,37 @@ export default function Schedule() {
       <Agenda
         items={items}
         loadItemsForMonth={(month) => { loadItems(month) }}
-        selected={'2020-07-18'}
-        renderItem={(day: ObjectItem) => renderItem(day)}
+        selected={'2020-07-25'}
+        renderDay={(day, item) => tryRenderDay(day, item)}
+        renderItem={(day: IObjectItem) => renderItem(day)}
         renderEmptyDate={() => { return (<View />); }}
-        rowHasChanged={(r1, r2) => { return r1.name !== r2.name }}
+        rowHasChanged={(r1, r2) => { return r1 !== r2 }}
+        onDayChange={(day)=>{console.log('day changed')}}
         markingType={'multi-dot'}
         markedDates={{
-          '2020-07-18': {dots: [{key:'massage', color: 'red', selectedDotColor: 'red'}]},
+          '2020-07-18': { dots: [{ key: 'massage', color: 'red', selectedDotColor: 'red' }] },
         }}
+      />
+      <IconButton style={style.floatButton}
+        icon={require('../../assets/plus-circle.png')}
+        color={'blue'}
+        size={50}
+        onPress={() => handleNewCadastro()}
       />
     </View>
   );
 };
+
+
+const style = StyleSheet.create({
+  floatButton: {
+    position: 'absolute',
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 30,
+    bottom: 30,
+  }
+
+})
