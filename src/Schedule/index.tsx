@@ -10,8 +10,7 @@ interface IObjectItem {
 export default function Schedule() {
   const [date, setDate] = useState('2020-07-25')
   const [items, setItems] = useState({});
-  const [reloadPage, setReloadPage] = useState(false);
-
+  
   useEffect(() => {
     setItems({
       '2020-07-25': [{ name: 'item 1 - any js object abc' }, { name: 'item 2 - any js object abc' }],
@@ -19,17 +18,16 @@ export default function Schedule() {
   }, []);
 
   async function handleNewCadastro() {
-    let newArray = items;
+    let day = items[date];
 
     
-    if (newArray[date] === undefined) {
-      newArray[date] = [{name: 'item 3 - any js object abc'}];
+    if (day === undefined) {
+      day = [{name: 'item 3 - any js object abc'}];
     } else {
-      newArray[date].push({name: 'item 3 - any js object abc'});
+      day.push({name: 'item 3 - any js object abc'});
     }
     
-    await setItems(newArray);
-    setReloadPage(reloadPage === true ? false : true );
+    setItems((old) => ({ ...old, day}));
   }
 
   function renderItem(item: any) {
